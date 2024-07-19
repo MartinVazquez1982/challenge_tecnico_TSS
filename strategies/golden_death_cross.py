@@ -13,25 +13,36 @@ class GoldenDeathCross (CrossMethod):
         self.long_sma = { assets: bt.indicators.SimpleMovingAverage(self.getdatabyname(assets).close, period=self.params.long_period) for assets in self.getdatanames() }
 
     def conditions_buy(self, market_data) -> bool:
-        """_summary_
+        """
+        Metodo que revisa la condicion para compra un activo. Realiza la compra si la 
+        SMA de periodo corto supero a la SMA de periodo largo.
+        
+        Args:
+            market_data: Market data del activo financiero en cuestion.
 
         Returns:
-            bool: _description_
+            bool: True si se encuentra en condiciones de comprar y False si no.
         """
         return self.sma[market_data._name][0] > self.long_sma[market_data._name][0]
     
     def conditions_sell(self, market_data) -> bool:
-        """_summary_
+        """
+        Metodo que revisa la condicion para vender un activo. Realiza la compra si la 
+        SMA de periodo largo supero a la SMA de periodo corto.
+        
+        Args:
+            market_data: Market data del activo financiero en cuestion.
 
         Returns:
-            bool: _description_
+            bool: True si se encuentra en condiciones de vender y False si no.
         """
         return self.sma[market_data._name][0] < self.long_sma[market_data._name][0]
     
     def __str__(self) -> str:
-        """_summary_
+        """
+        Retonda una representación en cadena del objeto.
 
         Returns:
-            str: _description_
+            str: Representación en cadena del objeto.
         """
         return f"Golden Death Cross - Short Period {self.params.period}|Long Period {self.params.long_period}"
