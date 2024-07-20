@@ -7,8 +7,8 @@ class CrossMethod(bt.Strategy):
         ('risk_fraction', 0.10),
     )
 
-
-
+    reserved_money = 0
+    
     def __init__(self):
         self.sma = { assets: bt.indicators.SimpleMovingAverage(self.getdatabyname(assets).close, period=self.params.period) for assets in self.getdatanames() }
         self.positions_strategy = { assets: 0 for assets in self.getdatanames() }
@@ -26,7 +26,8 @@ class CrossMethod(bt.Strategy):
             int: Size de la orden a enviar, 0 si no hay liquidez.
         """
         money = self.broker.getvalue() * self.params.risk_fraction
-        if money > self.broker.get_cash(): return 0
+        if money > self.broker.get_cash() - CrossMethod.reserved_money: return 0
+        CrossMethod.reserved_money += money
         return int ( money / market_data.close[0])
 
     
@@ -99,6 +100,7 @@ class CrossMethod(bt.Strategy):
                 
                 # Carga la cantidad de activos que compro la estrategia
                 self.positions_strategy[order.data._name] += order.size
+                CrossMethod.reserved_money -= order.size * order.data.close[0]
             elif order.issell():
                 print(f'VENTA COMPLETADA, Orden ID: {order.ref}, Asset {order.data._name}, Size {order.size}, Strategy {self}')
                 
@@ -109,7 +111,7 @@ class CrossMethod(bt.Strategy):
             print(f'ORDEN CANCELED, Orden ID: {order.ref}, Status: {order.status}')
         
         elif order.status == order.Margin:
-            print(f'ORDEN MARGIN, Orden ID: {order.ref}, Size: {order.size}, Asset {order.data.close[0]}')
+            print(f'=> ORDEN MARGIN, Size: {order.size}, Price {order.data.close[0]}, Asset {order.data._name}, Cash {self.broker.get_cash()}')
         
         elif order.status == order.Rejected:
             print(f'ORDEN REJECTED, Orden ID: {order.ref}, Status: {order.status}')
