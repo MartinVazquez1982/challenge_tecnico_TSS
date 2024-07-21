@@ -22,6 +22,7 @@ class BaseStrategy(bt.Strategy):
     
     params = (
         ('risk_fraction', 0.10),
+        ('logger', None),
     )
     
     reserved_money = 0
@@ -42,7 +43,11 @@ class BaseStrategy(bt.Strategy):
             dt (_type_, optional): _description_. Defaults to None.
         """
         dt = dt or self.datas[0].datetime.date(0)
-        print('%s, %s' % (dt.isoformat(), txt))
+        text = '%s, %s' % (dt.isoformat(), txt)
+        if self.params.logger is None:
+            print(text)
+        else:
+            self.params.logger.info(text)
         
         
     
