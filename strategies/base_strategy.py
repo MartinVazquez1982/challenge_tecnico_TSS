@@ -36,11 +36,12 @@ class BaseStrategy(bt.Strategy):
     
     
     def log(self, txt, dt=None):
-        """_summary_
+        """
+        Envia el texto al logger y si la estrategia no tiene un LogStrategy, Realiza un print.
 
         Args:
-            txt (_type_): _description_
-            dt (_type_, optional): _description_. Defaults to None.
+            txt (str): Texto a presentar
+            dt (datetime, optional): Fecha en la que se realizo la operacion. Defaults to None.
         """
         dt = dt or self.datas[0].datetime.date(0)
         text = '%s, %s' % (dt.isoformat(), txt)
