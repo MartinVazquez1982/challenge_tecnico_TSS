@@ -47,7 +47,7 @@ class BaseStrategy(bt.Strategy):
         if self.params.logger is None:
             print(text)
         else:
-            self.params.logger.info(text)
+            self.params.logger.write_log(text)
         
         
     
