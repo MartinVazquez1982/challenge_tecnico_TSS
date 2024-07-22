@@ -118,7 +118,7 @@ class BaseStrategy(bt.Strategy):
   
     def notify_order(self, order):
         """
-        metodo se ejecuta cuando hay cambios en el estado de la orden, para cuando 
+        Este metodo se ejecuta cuando hay cambios en el estado de la orden, para cuando 
         fue enviada o aceptada, no se realiza ninguna acción. Para el resto de
         las situaciones se realiza un log.
 
@@ -131,7 +131,7 @@ class BaseStrategy(bt.Strategy):
 
         if order.status == order.Completed:
             if order.isbuy():
-                self.log(f'COMPRA COMPLETADA, Orden ID: {order.ref}, Asset {order.data._name}, Size {order.size}, Strategy {self}')
+                self.log(f'COMPRA COMPLETADA, Orden ID: {order.ref}, Activo: {order.data._name}, Cantidad: {order.size}, Estrategia: {self}')
                 
                 # Carga la cantidad de activos que compro la estrategia
                 self.positions_strategy[order.data._name] += order.size
@@ -140,7 +140,7 @@ class BaseStrategy(bt.Strategy):
                 BaseStrategy.reserved_money -= order.size * order.data.close[0]
             
             elif order.issell():
-                self.log(f'VENTA COMPLETADA, Orden ID: {order.ref}, Asset {order.data._name}, Size {order.size}, Strategy {self}')
+                self.log(f'VENTA COMPLETADA, Orden ID: {order.ref}, Activo: {order.data._name}, Cantidad: {order.size}, Estrategia: {self}')
                 
                 # Elimina de la posicion la cantidad del activo que fue vendida, realiza una suma porque backtrader coloca negativos los sizes para las ordenes de venta
                 self.positions_strategy[order.data._name] += order.size
@@ -156,13 +156,14 @@ class BaseStrategy(bt.Strategy):
 
 
     def notify_trade(self, trade):
-        """_summary_
+        """
+        Este metodo es invocado tanto cuando una operación se abre como cuando se cierra, 
+        permitiendo registrar y analizar el desempeño de cada operación de manera detallada.
 
         Args:
-            trade (_type_): _description_
+            trade: Contiene la informacion detallada de la operacion (trade)
         """
         if trade.isclosed:
             # Información sobre la operación cerrada
-            self.log(f'Operacion cerrada: Precio de entrada {trade.price}, '
-                     f'Precio de salida {trade.price + trade.pnlcomm}, '
-                     f'Beneficio/Pérdida {trade.pnlcomm}')
+            self.log('OPERACION CERRADA: Activo: %s, Precio de entrada %.2f, Precio de salida %.2f, Beneficio/Perdida %.2f' % (trade.data._name, trade.price, trade.price + trade.pnlcomm, trade.pnlcomm))
+            self.log('VALOR DEL PORTFOLIO: %.2f' % (self.broker.getvalue()))
