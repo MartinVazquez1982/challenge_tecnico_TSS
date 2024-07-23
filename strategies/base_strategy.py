@@ -149,8 +149,9 @@ class BaseStrategy(bt.Strategy):
         elif order.status in [order.Canceled, order.Margin, order.Rejected]:
             self.log(f'ORDEN CANCELED/MARGIN/REJECTED, Orden ID: {order.ref}')
             
-            # Se habilita el dinero reservado
-            BaseStrategy.reserved_money -= order.size * order.data.close[0]
+            if order.isbuy():
+                # Se habilita el dinero reservado
+                BaseStrategy.reserved_money -= order.size * order.data.close[0]
 
         self.order = None
 
